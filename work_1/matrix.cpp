@@ -6,27 +6,74 @@
 using std::cin;
 using std::cout;
 using std::endl;
-using std::vector;
 using std::ostream;
+using std::ios;
 
-TMatrix::TMatrix(vector<number> arr)
+TMatrix::TMatrix()
 {
-    elements.resize(arr.size());
-    for (int i = 0; i < arr.size(); i++)
-        elements.push_back(arr[i]);
+    n = 0;
+    elements = nullptr;
 }
 
-ostream& operator<< (ostream& os, TMatrix& p)
+TMatrix::TMatrix(int n, number**& arr)
 {
-    int n = sqrt(p.elements.size());
+    this->n = n;
+    elements = arr;
+}
+
+TMatrix::TMatrix(const TMatrix& other)
+{
+    n = other.n;
+
+    number** newArr = new number * [n];
     for (int i = 0; i < n; i++)
     {
+        newArr[i] = new number[n];
         for (int j = 0; j < n; j++)
+            newArr[i][j] = other.elements[i][j];
+    }
+    elements = newArr;
+}
+
+
+TMatrix::~TMatrix()
+{
+    if (elements) {
+        for (int i = 0; i < n; i++)
+            delete[] elements[i];
+        delete[] elements;
+    }
+}
+
+ostream& operator<< (ostream& os, const TMatrix& m)
+{
+    for (int i = 0; i < m.n; i++)
+    {
+        cout << "[" << i + 1 << "] row: ";
+        for (int j = 0; j < m.n; j++)
         {
-            cout << p.elements[i * n + j] << " ";
+            cout.setf(ios::left);
+            cout.width(6);
+            cout << m.elements[i][j] << " ";
         }
         cout << endl;
     }
 
     return os;
+}
+
+void TMatrix::toDefaultMatrix()
+{
+    if (elements) {
+        for (int i = 0; i < n; i++)
+            delete[] elements[i];
+        delete[] elements;
+    }
+
+    n = 2;
+
+    number** defaultArr = new number * [2];
+    defaultArr[0] = new number[2]{ 1, 0 };
+    defaultArr[1] = new number[2]{ 0, 1 };
+    elements = defaultArr;
 }

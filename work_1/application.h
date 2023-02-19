@@ -4,7 +4,7 @@
 class TApplication
 {
 public:
-    TApplication();
+    TApplication() { };
     int exec();
 
 private:
