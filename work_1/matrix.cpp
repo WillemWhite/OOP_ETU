@@ -8,41 +8,55 @@ using std::cout;
 using std::endl;
 using std::ostream;
 using std::ios;
+using std::swap;
 
-TMatrix::TMatrix()
+TMatrix::TMatrix(bool def = false)
 {
-    n = 0;
-    elements = nullptr;
+    if (def) {
+        n = 2;
+
+        number** defaultArr = new number * [2];
+        defaultArr[0] = new number[2]{ 1, 0 };
+        defaultArr[1] = new number[2]{ 0, 1 };
+        elements = defaultArr;
+    }
+    else {
+        n = 0;
+        elements = nullptr;
+    }
 }
 
 TMatrix::TMatrix(int n, number**& arr)
 {
     this->n = n;
-    elements = arr;
+    elements = new number * [n];
+    for (int i = 0; i < n; i++)
+    {
+        elements[i] = new number[n];
+        for (int j = 0; j < n; j++)
+            elements[i][j] = arr[i][j];
+    }
 }
 
 TMatrix::TMatrix(const TMatrix& other)
 {
     n = other.n;
 
-    number** newArr = new number * [n];
+    elements = new number * [n];
     for (int i = 0; i < n; i++)
     {
-        newArr[i] = new number[n];
+        elements[i] = new number[n];
         for (int j = 0; j < n; j++)
-            newArr[i][j] = other.elements[i][j];
+            this->elements[i][j] = other.elements[i][j];
     }
-    elements = newArr;
 }
 
 
 TMatrix::~TMatrix()
 {
-    if (elements) {
+    if (elements)
         for (int i = 0; i < n; i++)
             delete[] elements[i];
-        delete[] elements;
-    }
 }
 
 ostream& operator<< (ostream& os, const TMatrix& m)
@@ -62,116 +76,63 @@ ostream& operator<< (ostream& os, const TMatrix& m)
     return os;
 }
 
-void TMatrix::toDefaultMatrix()
+TMatrix* TMatrix::getMatrWithoutRowAndCol(int row, int col)
 {
-    if (elements) {
-        for (int i = 0; i < n; i++)
-            delete[] elements[i];
-        delete[] elements;
-    }
-
-    n = 2;
-
-    number** defaultArr = new number * [2];
-    defaultArr[0] = new number[2]{ 1, 0 };
-    defaultArr[1] = new number[2]{ 0, 1 };
-    elements = defaultArr;
-}
-
-void GetMatr(number** mas, number** p, int i, int j, int m)
-{
-    int ki, kj, di, dj;
-    di = 0;
-    for (ki = 0; ki < m - 1; ki++)
+    auto resArr = new number * [n - 1];
+    int curRow = 0;
+    for (int i = 0; i < n; i++)
     {
-        if (ki == i)
-            di = 1;
-        dj = 0;
-        for (kj = 0; kj < m - 1; kj++)
+        resArr[i] = new number[n - 1];
+        int curCol = 0;
+        for (int j = 0; j < n; j++)
         {
-            if (kj == j)
-                dj = 1;
-            p[ki][kj] = mas[ki + di][kj + dj];
-        }
-    }
-}
+            if (i == row)
+                break;
+            if (j != col) {
+                resArr[curRow][curCol] = elements[i][j];
 
-number helpD(number** mas, int m)
-{
-    int i, k, n;
-    number d;
-    number** p;
-
-    p = new number * [m];
-    for (i = 0; i < m; i++)
-        p[i] = new number[m];
-
-    d = 0;
-    k = 1;
-    n = m - 1;
-
-    if (m < 1)
-        cout << "Finding determinant is impossible!" << endl;
-    if (m == 1)
-    {
-        d = mas[0][0];
-        return(d);
-    }
-    if (m == 2)
-    {
-        d = mas[0][0] * mas[1][1] - (mas[1][0] * mas[0][1]);
-        return(d);
-    }
-    if (m > 2)
-    {
-        for (i = 0; i < m; i++)
-        {
-            GetMatr(mas, p, i, 0, m);
-            d = d + k * mas[i][0] * helpD(p, n);
-            k = -k;
+                // Moving to the next element
+                if (curCol != n - 2) {
+                    curCol++;
+                }
+                else {
+                    curCol = 0;
+                    curRow++;
+                }
+            }
         }
     }
 
-    return(d);
+    auto resMatrix = new TMatrix(n - 1, resArr);
+    return resMatrix;
 }
 
 number TMatrix::findDet()
 {
-    int i, k, n;
-    number d;
-    number** p;
-
-    p = new number * [this->n];
-    for (i = 0; i < this->n; i++)
-        p[i] = new number[this->n];
-
-    d = 0;
-    k = 1;
-    n = this->n - 1;
-
-    if (this->n < 1)
+    if (n == 2)
+        return elements[0][0] * elements[1][1] - elements[0][1] * elements[1][0];
+    if (n == 1)
+        return elements[0][0];
+    if (n < 1) {
         cout << "Finding determinant is impossible!" << endl;
-    if (this->n == 1)
-    {
-        d = this->elements[0][0];
-        return(d);
+        return NULL;
     }
-    if (this->n == 2)
-    {
-        d = this->elements[0][0] * this->elements[1][1] - (this->elements[1][0] * this->elements[0][1]);
-        return(d);
-    }
-    if (this->n > 2)
-    {
-        for (i = 0; i < this->n; i++)
+    else {
+        number det = 0;
+        for (int j = 0; j < n; j++)
         {
-            GetMatr(this->elements, p, i, 0, this->n);
-            d = d + k * this->elements[i][0] * helpD(p, n);
-            k = -k;
-        }
-    }
+            auto matrWithoutRowAndCol = this->getMatrWithoutRowAndCol(0, j);
+            number minor = matrWithoutRowAndCol->findDet();
+            if (j & 1)
+                det += -elements[0][j] * minor;
+            else
+                det += elements[0][j] * minor;
 
-    return(d);
+            delete matrWithoutRowAndCol;
+        }
+
+        return det;
+    }
 }
 
 void TMatrix::transpose()
@@ -179,70 +140,59 @@ void TMatrix::transpose()
     for (int i = 0; i < n; i++)
         for (int j = i; j < n; j++)
             if (i != j)
-                std::swap(elements[i][j], elements[j][i]);
+                swap(elements[i][j], elements[j][i]);
 
     cout << "Matrix transposed! Press 5 to print it." << endl << endl;
 }
 
-void swapRows(number** arr, int row1, int row2, int col)
+void TMatrix::swapRows(int row1, int row2)
 {
-    for (int i = 0; i < col; i++)
+    for (int i = 0; i < n; i++)
     {
-        number temp = arr[row1][i];
-        arr[row1][i] = arr[row2][i];
-        arr[row2][i] = temp;
+        number temp = elements[row1][i];
+        elements[row1][i] = elements[row2][i];
+        elements[row2][i] = temp;
     }
 }
 
 int TMatrix::findRank()
 {
-    int rank = this->n;
+    TMatrix cpMatrix = *this;
+    number** cpArr = cpMatrix.elements;
+    int rank = 0;
 
-    number** copy = new number * [this->n];
-    for (int i = 0; i < this->n; i++)
-        copy[i] = new double[this->n];
-
-    for (int i = 0; i < this->n; i++)
-        for (int j = 0; j < this->n; j++)
-            copy[i][j] = this->elements[i][j];
-
-    for (int row = 0; row < rank; row++)
+    for (int col = 0; col < n; col++)
     {
-        if (copy[row][row] != 0)
+        if (cpArr[rank][col] != 0)
         {
-            for (int col = 0; col < this->n; col++)
+            for (int row = rank + 1; row < n; row++)
             {
-                if (col != row)
-                {
-                    number mult = copy[col][row] / copy[row][row];
-                    for (int i = 0; i < rank; i++)
-                        copy[col][i] -= mult * copy[row][i];
-                }
+                number mult = cpArr[row][col] / cpArr[rank][col];
+                for (int i = col; i < n; i++)
+                    cpArr[row][i] -= mult * cpArr[rank][i];
             }
+            rank++;
         }
         else
         {
-            bool reduce = true;
-
-            for (int i = row + 1; i < this->n; i++)
+            bool increaseRank = false;
+            for (int row = rank + 1; row < n; row++)
             {
-                if (copy[i][row])
-                {
-                    swapRows(copy, row, i, rank);
-                    reduce = false;
-                    break;
+                if (cpArr[row][col] && !increaseRank) {
+                    increaseRank = true;
+                    cpMatrix.swapRows(row, rank);
+                }
+                else if (!increaseRank)
+                    continue;
+                else {
+                    number mult = cpArr[row][col] / cpArr[rank][col];
+                    for (int i = col; i < n; i++)
+                        cpArr[row][i] -= mult * cpArr[rank][i];
                 }
             }
-            if (reduce)
-            {
-                rank--;
-                for (int i = 0; i < this->n; i++)
-                    copy[i][row] = copy[i][rank];
-            }
-
-            row--;
+            if (increaseRank)
+                rank++;
         }
-
     }
     return rank;
 }
