@@ -1,5 +1,5 @@
-#ifndef TAPPLICATION_H
-#define TAPPLICATION_H
+#ifndef APPLICATION_H
+#define APPLICATION_H
 
 class TApplication
 {
@@ -10,4 +10,4 @@ private:
     int menu();
 };
 
-#endif // TAPPLICATION_H
+#endif // APPLICATION_H

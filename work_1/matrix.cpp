@@ -51,29 +51,11 @@ TMatrix::TMatrix(const TMatrix& other)
     }
 }
 
-
 TMatrix::~TMatrix()
 {
     if (elements)
         for (int i = 0; i < n; i++)
             delete[] elements[i];
-}
-
-ostream& operator<< (ostream& os, const TMatrix& m)
-{
-    for (int i = 0; i < m.n; i++)
-    {
-        cout << "[" << i + 1 << "] row: ";
-        for (int j = 0; j < m.n; j++)
-        {
-            cout.setf(ios::left);
-            cout.width(6);
-            cout << m.elements[i][j] << " ";
-        }
-        cout << endl;
-    }
-
-    return os;
 }
 
 TMatrix* TMatrix::getMatrWithoutRowAndCol(int row, int col)
@@ -178,7 +160,7 @@ int TMatrix::findRank()
             bool increaseRank = false;
             for (int row = rank + 1; row < n; row++)
             {
-                if (cpArr[row][col] && !increaseRank) {
+                if ((cpArr[row][col] != 0) && !increaseRank) {
                     increaseRank = true;
                     cpMatrix.swapRows(row, rank);
                 }
@@ -195,4 +177,21 @@ int TMatrix::findRank()
         }
     }
     return rank;
+}
+
+ostream& operator<< (ostream& os, const TMatrix& m)
+{
+    for (int i = 0; i < m.n; i++)
+    {
+        cout << "[" << i + 1 << "] row: ";
+        for (int j = 0; j < m.n; j++)
+        {
+            cout.setf(ios::left);
+            cout.width(6);
+            cout << m.elements[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    return os;
 }

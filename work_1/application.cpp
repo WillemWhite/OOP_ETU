@@ -35,12 +35,16 @@ int TApplication::exec()
             cin >> n;
             SKIP_UNTIL_ENDLINE;
 
-            cout << "Enter the elements separated by a space" << endl
-                << "in the corresponding lines, for example:" << endl
-                << "[1]: 1  0   11  2 " << endl
-                << "[2]: 3  23  44  2 " << endl
-                << "[3]: 4  33  2   4 " << endl
-                << "[4]: 6  7   8   20" << endl
+            cout << "enter the matrix elements as complex numbers like" << endl
+                << "'(a, b)', where:" << endl
+                << "'a' is the real part;" << endl
+                << "'b' is the imaginary part." << endl
+                << "Complex numbers are entered in the row" << endl
+                << "corresponding to the row of the matrix, for example:" << endl
+                << "[1]: (1,2)  (2.4)    (0,-234.3)  (2) " << endl
+                << "[2]: (3,0)  (0,23)   (,44)       (2) " << endl
+                << "[3]: (4)    (33,-23) (2,343)     (4) " << endl
+                << "[4]: (6)    (7)      (8,3)   (20,20)" << endl
                 << endl;
 
             number** inputArr = new number * [n];
@@ -89,7 +93,7 @@ int TApplication::exec()
             break;
         case 4:
         {
-            number r = userMatrix->findRank();
+            int r = userMatrix->findRank();
             cout << "Rank: " << r << endl;
             cout << endl;
             break;
