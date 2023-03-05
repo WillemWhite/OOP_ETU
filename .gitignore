@@ -547,6 +547,11 @@ FodyWeavers.xsd
 *.mp4
 /Videos
 
+# Office
+*.docx
+*.doc
+*.pptx
+
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
 
