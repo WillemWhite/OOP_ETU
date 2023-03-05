@@ -53,26 +53,10 @@ int TApplication::exec()
             {
                 inputArr[i] = new number[n];
                 cout << "[" << i + 1 << "] row: ";
-                bool fail = false;
 
                 for (int j = 0; j < n; j++)
-                {
-                    if (!(cin >> inputArr[i][j]))
-                        fail = true;
-                }
+                    cin >> inputArr[i][j];
                 SKIP_UNTIL_ENDLINE;
-
-                if (fail)
-                {
-                    cout << "error: the size of the entered string"
-                        "is less than the declared" << endl;
-
-                    for (int j = i; j >= 0; j--)
-                        delete[] inputArr[j];
-                    delete[] inputArr;
-
-                    return 0;
-                }
             }
             userMatrix = new TMatrix(n, inputArr);
             for (int i = 0; i < n; i++)
