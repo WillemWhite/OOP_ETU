@@ -97,7 +97,7 @@ number TMatrix::findDet()
         return elements[0][0];
     if (n < 1) {
         cout << "Finding determinant is impossible!" << endl;
-        return NULL;
+        return 0;
     }
     else {
         number det = 0;
